@@ -16,6 +16,8 @@
 		83BD0BF52BD355F600E88D05 /* test1Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83BD0BF42BD355F600E88D05 /* test1Tests.swift */; };
 		83BD0BFF2BD355F600E88D05 /* test1UITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83BD0BFE2BD355F600E88D05 /* test1UITests.swift */; };
 		83BD0C012BD355F600E88D05 /* test1UITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83BD0C002BD355F600E88D05 /* test1UITestsLaunchTests.swift */; };
+		83BD0C102BD8B45B00E88D05 /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83BD0C0F2BD8B45B00E88D05 /* DetailViewController.swift */; };
+		83BD0C132BD8B57400E88D05 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83BD0C122BD8B57400E88D05 /* WebKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -49,6 +51,8 @@
 		83BD0BFA2BD355F600E88D05 /* test1UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = test1UITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		83BD0BFE2BD355F600E88D05 /* test1UITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = test1UITests.swift; sourceTree = "<group>"; };
 		83BD0C002BD355F600E88D05 /* test1UITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = test1UITestsLaunchTests.swift; sourceTree = "<group>"; };
+		83BD0C0F2BD8B45B00E88D05 /* DetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailViewController.swift; sourceTree = "<group>"; };
+		83BD0C122BD8B57400E88D05 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,6 +60,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				83BD0C132BD8B57400E88D05 /* WebKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -83,6 +88,7 @@
 				83BD0BF32BD355F600E88D05 /* test1Tests */,
 				83BD0BFD2BD355F600E88D05 /* test1UITests */,
 				83BD0BDB2BD355F400E88D05 /* Products */,
+				83BD0C112BD8B57400E88D05 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -106,6 +112,7 @@
 				83BD0BE62BD355F600E88D05 /* Assets.xcassets */,
 				83BD0BE82BD355F600E88D05 /* LaunchScreen.storyboard */,
 				83BD0BEB2BD355F600E88D05 /* Info.plist */,
+				83BD0C0F2BD8B45B00E88D05 /* DetailViewController.swift */,
 			);
 			path = test1;
 			sourceTree = "<group>";
@@ -125,6 +132,14 @@
 				83BD0C002BD355F600E88D05 /* test1UITestsLaunchTests.swift */,
 			);
 			path = test1UITests;
+			sourceTree = "<group>";
+		};
+		83BD0C112BD8B57400E88D05 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				83BD0C122BD8B57400E88D05 /* WebKit.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -261,6 +276,7 @@
 				83BD0BE22BD355F400E88D05 /* ViewController.swift in Sources */,
 				83BD0BDE2BD355F400E88D05 /* AppDelegate.swift in Sources */,
 				83BD0BE02BD355F400E88D05 /* SceneDelegate.swift in Sources */,
+				83BD0C102BD8B45B00E88D05 /* DetailViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
