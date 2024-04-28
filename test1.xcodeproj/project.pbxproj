@@ -108,11 +108,11 @@
 				83BD0BDD2BD355F400E88D05 /* AppDelegate.swift */,
 				83BD0BDF2BD355F400E88D05 /* SceneDelegate.swift */,
 				83BD0BE12BD355F400E88D05 /* ViewController.swift */,
+				83BD0C0F2BD8B45B00E88D05 /* DetailViewController.swift */,
 				83BD0BE32BD355F400E88D05 /* Main.storyboard */,
 				83BD0BE62BD355F600E88D05 /* Assets.xcassets */,
 				83BD0BE82BD355F600E88D05 /* LaunchScreen.storyboard */,
 				83BD0BEB2BD355F600E88D05 /* Info.plist */,
-				83BD0C0F2BD8B45B00E88D05 /* DetailViewController.swift */,
 			);
 			path = test1;
 			sourceTree = "<group>";
