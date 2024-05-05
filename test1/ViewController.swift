@@ -10,17 +10,10 @@ import UIKit
 class ViewController: UITableViewController, UITableViewDataSourcePrefetching {
     var queue = DispatchQueue(label:"preloads", qos: .background)
     var lock = NSLock()
-    var session: URLSession
     
     let indexUrl = URL(string: "https://hacker-news.firebaseio.com/v0/newstories.json")
     var index = [UInt]()
     var cachedContent = [Int: [String:Any]]()
-    
-    required init?(coder: NSCoder) {
-        let config = URLSessionConfiguration.background(withIdentifier: "dataLoader")
-        self.session = URLSession(configuration: config)
-        super.init(coder: coder)
-    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -157,5 +150,6 @@ class ViewController: UITableViewController, UITableViewDataSourcePrefetching {
     func handleError(error: String) {
         
     }
+
 }
 
