@@ -21,6 +21,7 @@ class ViewController: UITableViewController, UITableViewDataSourcePrefetching {
         self.tableView.prefetchDataSource = self
         self.tableView.refreshControl = UIRefreshControl()
         self.tableView.refreshControl?.addTarget(self, action: #selector(loadIndex), for: .valueChanged)
+        
         // Do any additional setup after loading the view.
         loadIndex()
     }
@@ -136,6 +137,7 @@ class ViewController: UITableViewController, UITableViewDataSourcePrefetching {
             let session = URLSession.shared
             let request = URLRequest(url: indexUrl)
             session.dataTask(with: request) { data, response, error in
+                self.refreshControl?.endRefreshing()
                 if let error = error {
                     self.handleError(error: error.localizedDescription)
                     return
@@ -150,7 +152,6 @@ class ViewController: UITableViewController, UITableViewDataSourcePrefetching {
                             }
                         }
                         DispatchQueue.main.async {
-                            self.refreshControl?.endRefreshing()
                             self.tableView.reloadData()
                         }
                     }
@@ -160,7 +161,11 @@ class ViewController: UITableViewController, UITableViewDataSourcePrefetching {
     }
     
     func handleError(error: String) {
-        
+        DispatchQueue.main.async {
+            let alert = UIAlertController(title: "Problem", message: error, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default))
+            self.present(alert, animated: true)
+        }
     }
 
 }
