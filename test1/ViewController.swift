@@ -19,6 +19,8 @@ class ViewController: UITableViewController, UITableViewDataSourcePrefetching {
         super.viewDidLoad()
         self.title = "Hacker News"
         self.tableView.prefetchDataSource = self
+        self.tableView.refreshControl = UIRefreshControl()
+        self.tableView.refreshControl?.addTarget(self, action: #selector(loadIndex), for: .valueChanged)
         // Do any additional setup after loading the view.
         loadIndex()
     }
@@ -124,6 +126,7 @@ class ViewController: UITableViewController, UITableViewDataSourcePrefetching {
         }.resume()
     }
     
+    @objc
     func loadIndex() {
         guard let indexUrl = indexUrl else {
             handleError(error: "URL is empty or error")
@@ -138,8 +141,15 @@ class ViewController: UITableViewController, UITableViewDataSourcePrefetching {
             }
             if let data = data {
                 if let content = try? JSONSerialization.jsonObject(with: data) {
-                    self.index = content as! [UInt]
+                    if let content = content as? [UInt] {
+                        content.reversed().forEach { item in
+                            if !self.index.contains(item) {
+                                self.index.insert(item, at: 0)
+                            }
+                        }
+                    }
                     DispatchQueue.main.async {
+                        self.refreshControl?.endRefreshing()
                         self.tableView.reloadData()
                     }
                 }
