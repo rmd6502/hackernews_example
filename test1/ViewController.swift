@@ -132,29 +132,31 @@ class ViewController: UITableViewController, UITableViewDataSourcePrefetching {
             handleError(error: "URL is empty or error")
             return
         }
-        let session = URLSession.shared
-        let request = URLRequest(url: indexUrl)
-        session.dataTask(with: request) { data, response, error in
-            if let error = error {
-                self.handleError(error: error.localizedDescription)
-                return
-            }
-            if let data = data {
-                if let content = try? JSONSerialization.jsonObject(with: data) {
-                    if let content = content as? [UInt] {
-                        content.reversed().forEach { item in
-                            if !self.index.contains(item) {
-                                self.index.insert(item, at: 0)
+        queue.async { [self] in
+            let session = URLSession.shared
+            let request = URLRequest(url: indexUrl)
+            session.dataTask(with: request) { data, response, error in
+                if let error = error {
+                    self.handleError(error: error.localizedDescription)
+                    return
+                }
+                if let data = data {
+                    if let content = try? JSONSerialization.jsonObject(with: data) {
+                        if let content = content as? [UInt] {
+                            content.reversed().forEach { item in
+                                if !self.index.contains(item) {
+                                    self.index.insert(item, at: 0)
+                                }
                             }
                         }
-                    }
-                    DispatchQueue.main.async {
-                        self.refreshControl?.endRefreshing()
-                        self.tableView.reloadData()
+                        DispatchQueue.main.async {
+                            self.refreshControl?.endRefreshing()
+                            self.tableView.reloadData()
+                        }
                     }
                 }
-            }
-        }.resume()
+            }.resume()
+        }
     }
     
     func handleError(error: String) {
