@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SystemConfiguration
 
 class ViewController: UITableViewController, UITableViewDataSourcePrefetching {
     var queue = DispatchQueue(label:"preloads", qos: .background)
@@ -14,6 +15,7 @@ class ViewController: UITableViewController, UITableViewDataSourcePrefetching {
     let indexUrl = URL(string: "https://hacker-news.firebaseio.com/v0/newstories.json")
     var index = [UInt]()
     var cachedContent = [Int: [String:Any]]()
+    let reachability = SCNetworkReachabilityCreateWithName(nil, "apple.com")
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -21,7 +23,6 @@ class ViewController: UITableViewController, UITableViewDataSourcePrefetching {
         self.tableView.prefetchDataSource = self
         self.tableView.refreshControl = UIRefreshControl()
         self.tableView.refreshControl?.addTarget(self, action: #selector(loadIndex), for: .valueChanged)
-        
         // Do any additional setup after loading the view.
         loadIndex()
     }
@@ -134,10 +135,20 @@ class ViewController: UITableViewController, UITableViewDataSourcePrefetching {
             return
         }
         queue.async { [self] in
+            if let reachability = reachability {
+                var flags = SCNetworkReachabilityFlags(rawValue: 0)
+                SCNetworkReachabilityGetFlags(reachability, &flags)
+                if flags != SCNetworkReachabilityFlags.reachable {
+                    handleError(error: "Not Connected")
+                    return
+                }
+            }
             let session = URLSession.shared
             let request = URLRequest(url: indexUrl)
             session.dataTask(with: request) { data, response, error in
-                self.refreshControl?.endRefreshing()
+                DispatchQueue.main.async {
+                    self.refreshControl?.endRefreshing()
+                }
                 if let error = error {
                     self.handleError(error: error.localizedDescription)
                     return
