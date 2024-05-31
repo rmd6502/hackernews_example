@@ -7,6 +7,7 @@
 
 import UIKit
 import SystemConfiguration
+import MLKit
 
 class ViewController: UITableViewController, UITableViewDataSourcePrefetching {
     var queue = DispatchQueue(label:"preloads", qos: .background)
@@ -15,16 +16,35 @@ class ViewController: UITableViewController, UITableViewDataSourcePrefetching {
     let indexUrl = URL(string: "https://hacker-news.firebaseio.com/v0/newstories.json")
     var index = [UInt]()
     var cachedContent = [Int: [String:Any]]()
-    let reachability = SCNetworkReachabilityCreateWithName(nil, "apple.com")
+    var translator: Translator? = nil
     
     override func viewDidLoad() {
-        super.viewDidLoad()
-        self.title = "Hacker News"
-        self.tableView.prefetchDataSource = self
-        self.tableView.refreshControl = UIRefreshControl()
-        self.tableView.refreshControl?.addTarget(self, action: #selector(loadIndex), for: .valueChanged)
-        // Do any additional setup after loading the view.
-        loadIndex()
+      super.viewDidLoad()
+      self.title = "Hacker News"
+      self.tableView.prefetchDataSource = self
+      self.tableView.refreshControl = UIRefreshControl()
+      self.tableView.refreshControl?.addTarget(self, action: #selector(loadIndex), for: .valueChanged)
+      // Create an English-locale translator:
+      let locale = String(Locale.preferredLanguages.first?.prefix(2) ?? "en")
+      let language = TranslateLanguage(rawValue: locale)
+      if language == .english {
+        self.loadIndex()
+        return
+      }
+      let options = TranslatorOptions(sourceLanguage: .english, targetLanguage: language)
+      translator = Translator.translator(options: options)
+      let condition = ModelDownloadConditions(allowsCellularAccess: true, allowsBackgroundDownloading: true)
+      let remoteModel = TranslateRemoteModel.translateRemoteModel(language: language)
+      if (translator == nil) || ModelManager.modelManager().isModelDownloaded(remoteModel) {
+        self.loadIndex()
+        return
+      }
+      guard let translator = translator else {
+        return
+      }
+      translator.downloadModelIfNeeded(with: condition) {error in
+        self.loadIndex()
+      }
     }
     
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -44,6 +64,7 @@ class ViewController: UITableViewController, UITableViewDataSourcePrefetching {
         cell?.accessoryType = .detailDisclosureButton
         lock.lock()
         if let record = cachedContent[indexPath.row] {
+            
             content?.text = record["title"] as? String ?? "(unknown)"
             var byline = ""
             if let author = record["by"] {
@@ -116,18 +137,31 @@ class ViewController: UITableViewController, UITableViewDataSourcePrefetching {
                 return
             }
             if let data = data {
-                if let content = try? JSONSerialization.jsonObject(with: data) {
-                    lock.lock()
-                    self.cachedContent[row] = content as? [String : Any]
-                    lock.unlock()
-                    DispatchQueue.main.async {
-                        self.tableView.reloadData()
+                if let content = try? JSONSerialization.jsonObject(with: data) as? [String:Any] {
+                    let title = content["title"] as? String ?? "(unknown)"
+                  if translator == nil {
+                    cacheCellContent(row: row, content: content)
+                  } else {
+                    translator?.translate(title) { [self] translatedTitle,error in
+                      var cached = content
+                      cached["title"] = translatedTitle
+                      cacheCellContent(row: row, content: cached)
                     }
+                  }
                 }
             }
         }.resume()
     }
-    
+
+  private func cacheCellContent(row: Int, content: [String:Any]) {
+    lock.lock()
+    self.cachedContent[row] = content
+    lock.unlock()
+    DispatchQueue.main.async {
+      self.tableView.reloadData()
+    }
+  }
+
     @objc
     func loadIndex() {
         guard let indexUrl = indexUrl else {
@@ -135,14 +169,6 @@ class ViewController: UITableViewController, UITableViewDataSourcePrefetching {
             return
         }
         queue.async { [self] in
-            if let reachability = reachability {
-                var flags = SCNetworkReachabilityFlags(rawValue: 0)
-                SCNetworkReachabilityGetFlags(reachability, &flags)
-                if flags != SCNetworkReachabilityFlags.reachable {
-                    handleError(error: "Not Connected")
-                    return
-                }
-            }
             let session = URLSession.shared
             let request = URLRequest(url: indexUrl)
             session.dataTask(with: request) { data, response, error in
